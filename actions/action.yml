@@ -1,0 +1,16 @@
+name: aws ecr push image
+on:
+    workflow_call
+jobs: 
+    ecr-push:
+        runs-on: ubuntu-latest
+        steps:
+            - name: load aws credentials
+              uses: ./.github/workflows/actions/aws_creds.yml
+            - name: login to ECR
+              id: ecr_login
+              uses: aws-actions/amazon-ecr-login@v1
+            - name: build docker
+              run: |
+                docker build -t $TAG_NAME .
+                docker tag $TAG_NAME ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
